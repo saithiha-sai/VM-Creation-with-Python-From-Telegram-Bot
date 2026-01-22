@@ -8,7 +8,7 @@ import time
 nlp = spacy.load("en_core_web_sm")
 
 # Telegram Bot Token
-bot = telebot.TeleBot("8070703754:AAFtWrztBwTy-A7zp7RC_OPOGPQAK_OI__A")
+bot = telebot.TeleBot("Telegram ID")
 
 # Temporary user data store
 user_data = {}
@@ -27,15 +27,15 @@ def handle_message(message):
 
     if detect_create_vm(text):
         user_data[chat_id] = {}
-        bot.send_message(chat_id, "🖥️ What is the VM name?")
+        bot.send_message(chat_id, " What is the VM name?")
         bot.register_next_step_handler(message, ask_cpu)
     else:
-        bot.send_message(chat_id, "❓ Please type something like 'Create VM' to begin.")
+        bot.send_message(chat_id, " Please type something like 'Create VM' to begin.")
 
 def ask_cpu(message):
     chat_id = message.chat.id
     user_data[chat_id]['vm_name'] = message.text.strip()
-    bot.send_message(chat_id, "💽 How many vCPUs?")
+    bot.send_message(chat_id, "How many vCPUs?")
     bot.register_next_step_handler(message, ask_ram)
 
 def ask_ram(message):
@@ -43,12 +43,12 @@ def ask_ram(message):
     try:
         cpu_count = int(message.text.strip())
     except ValueError:
-        bot.send_message(chat_id, "⚠️ Please enter a valid number for vCPUs.")
+        bot.send_message(chat_id, " Please enter a valid number for vCPUs.")
         bot.register_next_step_handler(message, ask_ram)
         return
 
     user_data[chat_id]['cpu'] = cpu_count
-    bot.send_message(chat_id, "🧠 Enter RAM (e.g., 2G):")
+    bot.send_message(chat_id, " Enter RAM (e.g., 2G):")
     bot.register_next_step_handler(message, ask_hdd)
 
 def ask_hdd(message):
@@ -56,13 +56,13 @@ def ask_hdd(message):
     ram_input = message.text.strip().lower()
     ram_gb_match = re.findall(r'\d+', ram_input)
     if not ram_gb_match:
-        bot.send_message(chat_id, "⚠️ Please enter RAM like '2G'. Try again:")
+        bot.send_message(chat_id, " Please enter RAM like '2G'. Try again:")
         bot.register_next_step_handler(message, ask_hdd)
         return
 
     ram_gb = int(ram_gb_match[0])
     user_data[chat_id]['ram'] = ram_gb * 1024
-    bot.send_message(chat_id, "📦 Enter HDD size (e.g., 20G):")
+    bot.send_message(chat_id, " Enter HDD size (e.g., 20G):")
     bot.register_next_step_handler(message, ask_iso)
 
 def ask_iso(message):
@@ -70,20 +70,20 @@ def ask_iso(message):
     hdd_input = message.text.strip().lower()
     hdd_gb_match = re.findall(r'\d+', hdd_input)
     if not hdd_gb_match:
-        bot.send_message(chat_id, "⚠️ Please enter HDD size like '20G'. Try again:")
+        bot.send_message(chat_id, " Please enter HDD size like '20G'. Try again:")
         bot.register_next_step_handler(message, ask_iso)
         return
 
     hdd_gb = int(hdd_gb_match[0])
     user_data[chat_id]['hdd'] = f"{hdd_gb}G"
-    bot.send_message(chat_id, "📁 Enter ISO filename (e.g., rhel-9.5-x86_64-dvd.iso):")
+    bot.send_message(chat_id, " Enter ISO filename (e.g., rhel-9.5-x86_64-dvd.iso):")
     bot.register_next_step_handler(message, finalize_creation)
 
 def finalize_creation(message):
     chat_id = message.chat.id
     iso_filename = message.text.strip()
     if not iso_filename.lower().endswith('.iso'):
-        bot.send_message(chat_id, "⚠️ Please enter a valid ISO filename ending with '.iso'. Try again:")
+        bot.send_message(chat_id, " Please enter a valid ISO filename ending with '.iso'. Try again:")
         bot.register_next_step_handler(message, finalize_creation)
         return
 
@@ -163,7 +163,7 @@ tools.syncTime = "TRUE"
 
         try:
             bot.send_message(chat_id,
-                f"✅ VM *{escape_markdown_v2(data['vm_name'])}* created successfully!\n"
+                f"VM *{escape_markdown_v2(data['vm_name'])}* created successfully!\n"
                 f"CPU: {cpu} (Cores/Socket: {cores_per_socket})\n"
                 f"RAM: {data['ram']} MB\n"
                 f"HDD: {data['hdd']}\n"
@@ -171,16 +171,17 @@ tools.syncTime = "TRUE"
                 parse_mode="MarkdownV2")
         except Exception:
             bot.send_message(chat_id,
-                f"✅ VM {data['vm_name']} created successfully!\n"
+                f" VM {data['vm_name']} created successfully!\n"
                 f"CPU: {cpu} (Cores/Socket: {cores_per_socket})\n"
                 f"RAM: {data['ram']} MB\n"
                 f"HDD: {data['hdd']}\n"
                 f"ISO: {data['iso']}")
 
     except Exception as e:
-        bot.send_message(chat_id, f"❌ VM creation failed:\n{str(e)}")
+        bot.send_message(chat_id, f" VM creation failed:\n{str(e)}")
 
     if chat_id in user_data:
         del user_data[chat_id]
 
 bot.infinity_polling()
+
